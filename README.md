@@ -188,7 +188,7 @@ New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Insta
 
 APIs & Services → Credentials → Create Credentials → OAuth client ID，類型選
 「網頁應用程式」。「已授權的 JavaScript 來源」填前端網址（步驟 5 的
-`https://group-judge.<你的子網域>.workers.dev`），本機要測的話再加
+`https://group-judge-web.boo-king-king.workers.dev`），本機要測的話再加
 `http://localhost:5173`。「已授權的重新導向 URI」不用填。
 
 第一次用這個 GCP 專案要先設 OAuth 同意畫面（External、填 App 名稱與你的 email
@@ -205,7 +205,9 @@ window.__GOOGLE_CLIENT_ID__ = '<步驟 4 的 Client ID>';
 ```
 
 Workers & Pages → Create → 連 `group-judge-web` 這個 repo，Deploy command 用預設的
-`npx wrangler deploy`。部署出來的網址回頭填進 Render 的 `ALLOWED_ORIGINS` 與 Google
+`npx wrangler deploy`。網址是 `https://group-judge-web.boo-king-king.workers.dev`
+（`boo-king-king` 是這個 Cloudflare 帳號的子網域，帳號底下每個 Worker 都掛在它下面，
+跟 boo-king-king 那個專案無關）。部署出來的網址回頭填進 Render 的 `ALLOWED_ORIGINS` 與 Google
 的授權來源（步驟 3、4、5 互相要對方的網址，所以會來回一次）。
 
 ### 6. LINE Developers Console（小判官）
