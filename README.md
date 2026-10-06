@@ -41,7 +41,8 @@ LINE 群組的每月整理工具，用來取代「揪揪」裡我們實際在用
 
 ## 後台
 
-用 Google 帳號登入，只有 `users` 表裡 `role = 1` 而且 email 對得上的人進得來。
+用 Google 帳號登入，只有 `users` 表裡 `role = 1` 而且 email 對得上的人進得來；另外
+`FIRST_ADMIN_EMAIL` 設的那個帳號一律進得來（成員資料是空的也一樣，見「上線」）。
 同一個網址，手機自動進行動版、電腦進桌面版（選單裡可以手動換）。
 
 - **版規**：看與改。
@@ -73,8 +74,10 @@ LINE 群組的每月整理工具，用來取代「揪揪」裡我們實際在用
    200 則。所以沒有推播功能，公告改成管理員在群組叫小判官時它才回。
 3. **官方文件說只有手機版發的訊息會附上發話者。** 沒附的訊息裡沒有任何能認人的
    東西，連哪幾則是同一個人發的都看不出來。這種訊息會留下時間與開頭 60 個字
-   （一百天後刪除），讓管理員在「未知發話」頁籤對照聊天紀錄後指認。實際上會有
-   多少則，要上線才知道。
+   （一百天後刪除），讓管理員在「未知發話」頁籤對照聊天紀錄後指認。
+   **2026-10-06 在測試群組試過：Mac 電腦版發的訊息有附發話者，小判官認得出來。**
+   Windows 版與其他情況還沒試過；「成員」頁籤的「認不出發話者的訊息」那一格會寫
+   統計區間之後又收到幾則，發一則之後看它有沒有增加就知道。
 
 ## 本機開發
 
@@ -178,7 +181,7 @@ New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Insta
   | `LINE_CHANNEL_SECRET` | 步驟 6 拿到 |
   | `LINE_CHANNEL_ACCESS_TOKEN` | 步驟 6 拿到 |
   | `GOOGLE_CLIENT_ID` | 步驟 4 拿到 |
-  | `FIRST_ADMIN_EMAIL` | 第一位管理員的 Google 帳號 |
+  | `FIRST_ADMIN_EMAIL` | 第一位管理員的 Google 帳號。這個帳號一律登得進後台，成員資料是空的也一樣 |
   | `ALLOWED_ORIGINS` | `https://beethoreven.github.io`（只有網域，不含路徑、不要結尾斜線） |
 
   LINE 與 Google 的值還沒有的時候可以先留空，服務照樣起得來（只是小判官與登入
@@ -236,28 +239,52 @@ cron-job.org 每 5～10 分鐘 GET `https://<Render 網址>/health`。這支不�
 curl https://<Render 網址>/health
 ```
 
-回 `{"ok":true}` 就是後端起來了。接著：
+回 `{"ok":true}` 就是後端起來了。`https://<Render 網址>/api/ready` 會列出每一項設定
+有沒有填，以及現在跑的是哪個 commit（前 7 碼）——推了新版本之後 Render 的畫面
+卡住的話，看這個數字換了沒。接著：
 
 1. 開前端網址，用 `FIRST_ADMIN_EMAIL` 那個 Google 帳號登入，看得到版規全文。
 2. **先開一個只有你自己的測試群組**把小判官拉進去（一個群組只能有一個官方帳號，
    正式群組要先把揪揪請出去才拉得進去）。在群組打「版規」，應該回一張卡片。
-3. 後台「成員」頁籤會出現你的 LINE 名稱，把那一筆的身分改成管理員；再到群組
-   tag 小判官說「整理完畢」，應該回廣告須知。
-4. 用電腦版 LINE 在測試群組說一句話，看後台「未知發話」有沒有多一則——這就是
-   「電腦版到底認不認得出人」的答案。
+3. 後台「成員」頁籤最上面會提醒「名單裡還沒有對應到你的那一筆」。你在群組說過
+   話之後，名單裡會出現你的 LINE 名稱：把那一筆的身分改成管理員、email 填你登入
+   的帳號，提醒就會消失（**直接在後台改，不要用 SQL**）。再到群組 tag 小判官說
+   「整理完畢」，應該回廣告須知。
+4. 用電腦版 LINE 在測試群組說一句話，再看「成員」頁籤「認不出發話者的訊息」那一格
+   寫的「統計區間之後到現在另有幾則」——有增加就是電腦版認不出人。（「未知發話」
+   頁籤只列統計區間裡的訊息，今天發的不會出現在那張表上。）
 
 ### 9. 從測試群組搬到正式群組
 
-小判官只認第一個有事件進來的群組，被拉進別的群組會自己退出。測試完要搬家時，
-在 Neon 的 SQL Editor 清掉測試資料，再到 Render 按 Manual Deploy → Restart：
+小判官只認第一個有事件進來的群組，被拉進別的群組會自己退出。搬家照這個順序：
 
-```sql
-TRUNCATE users, speak_log, unknown_messages, kicked_list, whitelist, sessions RESTART IDENTITY CASCADE;
-DELETE FROM settings;
-```
+1. **先把小判官請出測試群組。** 還待在裡面的話，清完資料之後那邊只要有人說一句
+   話，測試群組就又成了它服務的群組。
+2. 在 Neon 的 SQL Editor 清掉測試資料：
 
-（版規與訊息內容在 `messages` 表，不會被清掉。`FIRST_ADMIN_EMAIL` 那一筆會在重啟時
-自動建回來。）然後把揪揪請出正式群組、把小判官拉進去。
+   ```sql
+   TRUNCATE users, speak_log, unknown_messages, kicked_list, whitelist, sessions RESTART IDENTITY CASCADE;
+   DELETE FROM settings;
+   ```
+
+3. 把揪揪請出正式群組、把小判官拉進去。
+
+版規與訊息內容在 `messages` 表，不會被清掉。清完之後後台會要你重新登入——
+`FIRST_ADMIN_EMAIL` 那個帳號照樣進得來，進去之後照步驟 8 的第 3 點把自己設成管理員。
+不必重啟服務。
+
+### 10. 要直接改資料庫的時候
+
+後端有一部分狀態記在記憶體裡：每個人今天那一列發話紀錄寫過了沒、服務的是哪個
+群組。用 SQL 直接改 `users`、`speak_log`、`settings` 之後它會自己發現並補救（細節在
+`line_utils/tracker.py`、`line_utils/home_group.py` 開頭），但改完到 Render 按一次
+Manual Deploy → Restart service 最乾淨。
+
+★ **刪掉 `users` 的一列，那個人全部的發話紀錄與白名單紀錄會跟著一起刪。** 要把
+  兩筆資料併成一筆的話，留下有 LINE 帳號的那一筆，把另一筆的 email 與身分搬過來，
+  再刪沒有 LINE 帳號的那一筆——不要反過來。（2026-10-06 上線測試時就是反過來做，
+  之後說的話整天都沒記到。當時 `FIRST_ADMIN_EMAIL` 會自動建一筆只有 email 的資料，
+  才有兩筆要併；現在不建了。）
 
 要在 LINE 裡把後台網址傳給其他管理員，後面加 `?openExternalBrowser=1`，LINE 會
 改用手機的瀏覽器開。Google 不讓 App 內嵌的瀏覽器做登入，直接在 LINE 裡點開多半
