@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "fake-line",
+      "runtimeExecutable": "/Users/darkather/Codebase/group-judge/group-judge-backend/.venv/bin/python",
+      "runtimeArgs": ["/Users/darkather/Codebase/group-judge/group-judge-backend/tools/fake_line.py"],
+      "port": 5099
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "/Users/darkather/Codebase/group-judge/group-judge-backend/.venv/bin/gunicorn",
+      "runtimeArgs": ["--chdir", "/Users/darkather/Codebase/group-judge/group-judge-backend", "--workers", "1", "--threads", "8", "--bind", "127.0.0.1:5002", "app:app"],
+      "port": 5002
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-u", "/Users/darkather/Codebase/group-judge/group-judge-web/dev_server.py", "5173"],
+      "port": 5173
+    }
+  ]
+}

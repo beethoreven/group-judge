@@ -1,0 +1,9 @@
+# macOS Finder 的視窗狀態，跟專案無關。
+.DS_Store
+
+# 開發時拍給自己看的截圖與卡片 JSON，不是專案的一部分。
+screenshots/
+
+# Claude Code 的個人設定（每台機器不一樣，不該共用）。
+# .claude/launch.json 是專案共用的預覽伺服器設定，那個要留在版控裡。
+.claude/settings.local.json

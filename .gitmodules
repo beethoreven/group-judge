@@ -1,0 +1,6 @@
+[submodule "group-judge-backend"]
+	path = group-judge-backend
+	url = git@github.com-beethoreven:beethoreven/group-judge-backend.git
+[submodule "group-judge-web"]
+	path = group-judge-web
+	url = git@github.com-beethoreven:beethoreven/group-judge-web.git
