@@ -6,7 +6,7 @@ LINE 群組的每月整理工具，用來取代「揪揪」裡我們實際在用
 | 資料夾 | 內容 | 部署 |
 |---|---|---|
 | `group-judge-backend/` | 小判官（LINE bot）的 webhook，加上後台用的 API。Flask + Postgres | Render |
-| `group-judge-web/` | 管理員用的網頁後台。純靜態，沒有 build step | Cloudflare Workers |
+| `group-judge-web/` | 管理員用的網頁後台。純靜態，沒有 build step | GitHub Pages |
 
 資料庫是 Neon Postgres。**Render 與 Neon 要開在同一區（Singapore）**，否則每次查詢
 都要多等一秒以上。
@@ -179,7 +179,7 @@ New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Insta
   | `LINE_CHANNEL_ACCESS_TOKEN` | 步驟 6 拿到 |
   | `GOOGLE_CLIENT_ID` | 步驟 4 拿到 |
   | `FIRST_ADMIN_EMAIL` | 第一位管理員的 Google 帳號 |
-  | `ALLOWED_ORIGINS` | 步驟 5 部署出來的前端網址，不要結尾斜線 |
+  | `ALLOWED_ORIGINS` | `https://beethoreven.github.io`（只有網域，不含路徑、不要結尾斜線） |
 
   LINE 與 Google 的值還沒有的時候可以先留空，服務照樣起得來（只是小判官與登入
   先不能用），拿到之後補上、Render 會自動重啟。
@@ -187,15 +187,15 @@ New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Insta
 ### 4. Google Cloud Console（登入）
 
 APIs & Services → Credentials → Create Credentials → OAuth client ID，類型選
-「網頁應用程式」。「已授權的 JavaScript 來源」填前端網址（步驟 5 的
-`https://group-judge-web.boo-king-king.workers.dev`），本機要測的話再加
-`http://localhost:5173`。「已授權的重新導向 URI」不用填。
+「網頁應用程式」。「已授權的 JavaScript 來源」填 `https://beethoreven.github.io`
+（只有網域，不含 `/group-judge-web/`），本機要測的話再加 `http://localhost:5173`。
+「已授權的重新導向 URI」不用填。
 
 第一次用這個 GCP 專案要先設 OAuth 同意畫面（External、填 App 名稱與你的 email
 就好）。發佈狀態是 Testing 時，只有列在 Test users 的帳號登得進來——把三位管理員
 的 Google 帳號加進去，或直接按 Publish。
 
-### 5. Cloudflare（前端）
+### 5. GitHub Pages（前端）
 
 `group-judge-web/index.html` 填兩個值，commit、push：
 
@@ -204,11 +204,14 @@ window.__GROUP_JUDGE_API_HOST__ = 'https://<Render 給的網址>';
 window.__GOOGLE_CLIENT_ID__ = '<步驟 4 的 Client ID>';
 ```
 
-Workers & Pages → Create → 連 `group-judge-web` 這個 repo，Deploy command 用預設的
-`npx wrangler deploy`。網址是 `https://group-judge-web.boo-king-king.workers.dev`
-（`boo-king-king` 是這個 Cloudflare 帳號的子網域，帳號底下每個 Worker 都掛在它下面，
-跟 boo-king-king 那個專案無關）。部署出來的網址回頭填進 Render 的 `ALLOWED_ORIGINS` 與 Google
-的授權來源（步驟 3、4、5 互相要對方的網址，所以會來回一次）。
+`group-judge-web` 這個 repo 的 Settings → Pages → Source 選「Deploy from a branch」，
+分支 `main`、資料夾 `/ (root)`。網址是 https://beethoreven.github.io/group-judge-web/ 。
+
+- 免費方案的 Pages 要求 repo 是公開的。
+- 這個站的「來源」是 `https://beethoreven.github.io`（不含路徑）。Render 的
+  `ALLOWED_ORIGINS` 與步驟 4 的授權來源填的都是它。
+- 當初試過 Cloudflare Workers，但它的網址會掛在整個帳號共用的子網域底下
+  （`….boo-king-king.workers.dev`），所以改用 GitHub Pages（2026-10-06）。
 
 ### 6. LINE Developers Console（小判官）
 
