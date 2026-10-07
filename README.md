@@ -315,18 +315,27 @@ curl https://<Render 網址>/health
 
 1. **先把小判官請出測試群組。** 還待在裡面的話，清完資料之後那邊只要有人說一句
    話，測試群組就又成了它服務的群組。
-2. 在 Neon 的 SQL Editor 清掉測試資料：
+2. 在 Neon 的 SQL Editor 清掉測試資料，留下管理員那幾筆（登入用的 email 與身分都
+   在上面；下面假設他們是 id 1、2、3）：
 
    ```sql
-   TRUNCATE users, speak_log, unknown_messages, kicked_list, whitelist, sessions RESTART IDENTITY CASCADE;
-   DELETE FROM settings;
+   DELETE FROM users WHERE id NOT IN (1, 2, 3);
+   TRUNCATE speak_log, unknown_messages, kicked_list, whitelist RESTART IDENTITY CASCADE;
+   DELETE FROM settings WHERE key IN ('group_id', 'observing_since');
    ```
 
-3. 把揪揪請出正式群組、把小判官拉進去。
+3. **匯入正式群組的成員。** 揪揪還在正式群組裡的時候，從它的後台匯出最近 15、30、
+   60、90 天的「詳細聊天報表」四份，用 `group-judge-backend/tools/import_roster.py`
+   轉成 SQL，貼到 Neon 的 SQL Editor 執行（用法與 `decisions.json` 的格式在那支
+   程式開頭）。它只產生檔案，不會自己連資料庫；執行完會回報新增了幾筆。
+   報表、`decisions.json` 與產生的 SQL 都是真實姓名，放在 `private/`（不進 git）。
+4. 把揪揪請出正式群組、把小判官拉進去。
 
-版規與訊息內容在 `messages` 表，不會被清掉。清完之後後台會要你重新登入——
-`FIRST_ADMIN_EMAIL` 那個帳號照樣進得來，進去之後照步驟 8 的第 3 點把自己設成管理員。
-不必重啟服務。
+匯入的人只有名字、沒有 LINE 帳號。每個人第一次說話時，小判官用名字把帳號接上；
+改過名字或同名而接不上的，後台「成員」頁籤會多出一筆，用「合併…」併回去。還沒
+接上的人要是離開群組，小判官認不出來，要手動把他標成已離開。
+
+版規與訊息內容在 `messages` 表，不會被清掉。不必重啟服務。
 
 ### 10. 要直接改資料庫的時候
 
