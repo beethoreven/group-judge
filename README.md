@@ -145,6 +145,11 @@ Neon 免費方案的資料庫**一個月只能醒著 400 小時**（100 CU-hours
 - 到 320 之後還剩 80 小時。省電模式下會碰資料庫的只剩每個人當月的第一則、有人叫
   版規或下指令、收回訊息、成員進出與管理員開後台，量不大。真的太早就到 320 的話，
   把門檻調低（Render 的環境變數 `DB_SAVING_AFTER_HOURS`，設成 0 是完全不限制）。
+- **不用登入的請求碰不到資料庫。** 後台的登入憑證帶著簽章，不是小判官發的憑證在
+  查資料庫之前就被拒絕（`group-judge-backend/auth_utils/sessions.py`）。少了這一道，
+  任何人每幾分鐘帶一張假憑證來敲一次，就能讓資料庫整個月醒著、把額度耗盡。
+- **資料庫一句查詢最多等 20 秒**（`DB_TIMEOUT_SECONDS`）。超過就放棄，後台會跳一則
+  「資料庫超過 20 秒沒有回應」的提示；連不上的時候也一樣會講。
 
 細節在 `group-judge-backend/db/meter.py` 與 `line_utils/tracker.py` 開頭。
 
@@ -154,9 +159,15 @@ Neon 免費方案的資料庫**一個月只能醒著 400 小時**（100 CU-hours
 
 ```bash
 cd group-judge-backend
-python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
+pyenv install -s "$(cat .python-version)"        # 沒裝過這一版 Python 的話
+"$(pyenv root)/versions/$(cat .python-version)/bin/python" -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
 cp .env.example .env
 ```
+
+Python 的版本寫在 `group-judge-backend/.python-version`，本機與 Render 用的是同一版
+（Render 會自己讀這個檔案）。套件的版本一律先用最新的正式版，不相容才往下降，原因
+寫在 `requirements.txt` 與 `requirements-dev.txt` 裡。
 
 ```bash
 .venv/bin/python tools/local_db.py
@@ -239,6 +250,7 @@ Region 選 Singapore（ap-southeast-1）。連線字串用預設那個有 `-pool
 New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Instance Type Free。
 
 - Build Command：`pip install -r requirements.txt`
+  （Python 的版本不必在 Render 設定，它會讀 repo 裡的 `.python-version`）
 - Start Command：`gunicorn --workers 1 --threads 8 --timeout 60 app:app`
   （★ 只能一個 worker，理由見 `line_utils/tracker.py`）
 - Health Check Path：`/health`
