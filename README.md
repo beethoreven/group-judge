@@ -212,7 +212,7 @@ TEST_DATABASE_URL="postgresql://postgres:@/gj_test?host=$PWD/.localdb" .venv/bin
 ## 上線
 
 三個 repo：`group-judge`（這一層，只是把兩個子專案掛在一起）、`group-judge-backend`、
-`group-judge-web`，做法同 boo-king-king。GitHub 的 SSH 別名是
+`group-judge-web`。GitHub 的 SSH 別名是
 **`github.com-beethoreven`**，不是純 `github.com`。
 
 ### 1. 推上 GitHub
@@ -297,7 +297,7 @@ window.__GOOGLE_CLIENT_ID__ = '<步驟 4 的 Client ID>';
 - 這個站的「來源」是 `https://beethoreven.github.io`（不含路徑）。Render 的
   `ALLOWED_ORIGINS` 與步驟 4 的授權來源填的都是它。
 - 當初試過 Cloudflare Workers，但它的網址會掛在整個帳號共用的子網域底下
-  （`….boo-king-king.workers.dev`），所以改用 GitHub Pages（2026-10-06）。
+  （`…<帳號子網域>.workers.dev`），所以改用 GitHub Pages（2026-10-06）。
 
 ### 6. LINE Developers Console（小判官）
 
