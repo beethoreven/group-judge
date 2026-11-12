@@ -203,10 +203,10 @@ cd ../group-judge-web && python3 dev_server.py
 第二個指令會印出一個網址，貼到瀏覽器就是登入後的畫面（只在 localhost 有效）。
 `tools/send_event.py` 開頭列了所有能模擬的事件。
 
-測試（會清空 `gj_test`，所以只認 `TEST_DATABASE_URL`）：
+測試（會清空 `group_judge_test`，所以只認 `TEST_DATABASE_URL`）：
 
 ```bash
-TEST_DATABASE_URL="postgresql://postgres:@/gj_test?host=$PWD/.localdb" .venv/bin/python -m pytest
+TEST_DATABASE_URL="postgresql://postgres:@/group_judge_test?host=$PWD/.localdb" .venv/bin/python -m pytest
 ```
 
 ## 上線
