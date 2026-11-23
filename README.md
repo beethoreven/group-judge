@@ -287,7 +287,7 @@ New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Insta
   | `LINE_CHANNEL_ACCESS_TOKEN` | 步驟 6 拿到 |
   | `GOOGLE_CLIENT_ID` | 步驟 4 拿到 |
   | `FIRST_ADMIN_EMAIL` | 第一位管理員的 Google 帳號。這個帳號一律登得進後台，成員資料是空的也一樣 |
-  | `ALLOWED_ORIGINS` | `https://group-judge.github.io`（只有網域，不含路徑、不要結尾斜線）。網站剛從 `beethoreven` 搬到 `group-judge` 組織，舊的 `https://beethoreven.github.io` 暫時也還留著，逗號隔開 |
+  | `ALLOWED_ORIGINS` | `https://group-judge.github.io`（只有網域，不含路徑、不要結尾斜線） |
   | `DB_SAVING_AFTER_HOURS` | 不必填。資料庫這個月醒了幾小時之後退回省電模式，預設 320（見上面「資料庫用量與省電模式」） |
 
   LINE 與 Google 的值還沒有的時候可以先留空，服務照樣起得來（只是小判官與登入
@@ -298,7 +298,6 @@ New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Insta
 APIs & Services → Credentials → Create Credentials → OAuth client ID，類型選
 「網頁應用程式」。「已授權的 JavaScript 來源」填 `https://group-judge.github.io`
 （只有網域，不含 `/group-judge-web/`），本機要測的話再加 `http://localhost:5173`。
-搬家前的 `https://beethoreven.github.io` 暫時也還留著。
 「已授權的重新導向 URI」不用填。
 
 第一次用這個 GCP 專案要先設 OAuth 同意畫面（External、填 App 名稱與你的 email
