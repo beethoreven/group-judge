@@ -250,13 +250,13 @@ git branch -M main && git push -u origin main
 
 cd ../group-judge-web
 git init && git add -A && git commit -m "Initial commit"
-git remote add origin git@github.com-beethoreven:beethoreven/group-judge-web.git
+git remote add origin git@github.com-beethoreven:group-judge/group-judge-web.git
 git branch -M main && git push -u origin main
 
 cd ..
 git init
 git submodule add git@github.com-beethoreven:beethoreven/group-judge-backend.git group-judge-backend
-git submodule add git@github.com-beethoreven:beethoreven/group-judge-web.git group-judge-web
+git submodule add git@github.com-beethoreven:group-judge/group-judge-web.git group-judge-web
 git add -A && git commit -m "Initial commit"
 git remote add origin git@github.com-beethoreven:beethoreven/group-judge.git
 git branch -M main && git push -u origin main
@@ -287,7 +287,7 @@ New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Insta
   | `LINE_CHANNEL_ACCESS_TOKEN` | 步驟 6 拿到 |
   | `GOOGLE_CLIENT_ID` | 步驟 4 拿到 |
   | `FIRST_ADMIN_EMAIL` | 第一位管理員的 Google 帳號。這個帳號一律登得進後台，成員資料是空的也一樣 |
-  | `ALLOWED_ORIGINS` | `https://beethoreven.github.io`（只有網域，不含路徑、不要結尾斜線） |
+  | `ALLOWED_ORIGINS` | `https://group-judge.github.io`（只有網域，不含路徑、不要結尾斜線）。網站剛從 `beethoreven` 搬到 `group-judge` 組織，舊的 `https://beethoreven.github.io` 暫時也還留著，逗號隔開 |
   | `DB_SAVING_AFTER_HOURS` | 不必填。資料庫這個月醒了幾小時之後退回省電模式，預設 320（見上面「資料庫用量與省電模式」） |
 
   LINE 與 Google 的值還沒有的時候可以先留空，服務照樣起得來（只是小判官與登入
@@ -296,8 +296,9 @@ New → Web Service → 選 `group-judge-backend`，Region **Singapore**，Insta
 ### 4. Google Cloud Console（登入）
 
 APIs & Services → Credentials → Create Credentials → OAuth client ID，類型選
-「網頁應用程式」。「已授權的 JavaScript 來源」填 `https://beethoreven.github.io`
+「網頁應用程式」。「已授權的 JavaScript 來源」填 `https://group-judge.github.io`
 （只有網域，不含 `/group-judge-web/`），本機要測的話再加 `http://localhost:5173`。
+搬家前的 `https://beethoreven.github.io` 暫時也還留著。
 「已授權的重新導向 URI」不用填。
 
 第一次用這個 GCP 專案要先設 OAuth 同意畫面（External、填 App 名稱與你的 email
@@ -314,10 +315,10 @@ window.__GOOGLE_CLIENT_ID__ = '<步驟 4 的 Client ID>';
 ```
 
 `group-judge-web` 這個 repo 的 Settings → Pages → Source 選「Deploy from a branch」，
-分支 `main`、資料夾 `/ (root)`。網址是 https://beethoreven.github.io/group-judge-web/ 。
+分支 `main`、資料夾 `/ (root)`。網址是 https://group-judge.github.io/group-judge-web/ 。
 
 - 免費方案的 Pages 要求 repo 是公開的。
-- 這個站的「來源」是 `https://beethoreven.github.io`（不含路徑）。Render 的
+- 這個站的「來源」是 `https://group-judge.github.io`（不含路徑）。Render 的
   `ALLOWED_ORIGINS` 與步驟 4 的授權來源填的都是它。
 - 當初試過 Cloudflare Workers，但它的網址會掛在整個帳號共用的子網域底下
   （`…<帳號子網域>.workers.dev`），所以改用 GitHub Pages（2026-10-06）。
