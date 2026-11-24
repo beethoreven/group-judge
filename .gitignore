@@ -4,9 +4,10 @@
 # 開發時拍給自己看的截圖與卡片 JSON，不是專案的一部分。
 screenshots/
 
-# Claude Code 的個人設定（每台機器不一樣，不該共用）。
-# .claude/launch.json 是專案共用的預覽伺服器設定，那個要留在版控裡。
+# Claude Code 的設定（每台機器不一樣，不該共用）。launch.json 是本機預覽伺服器的設定，
+# 裡面是這台電腦的路徑，也只留在本機。
 .claude/settings.local.json
+.claude/launch.json
 
 # 群組成員的真實資料（名單、報表比對的工作檔）。這個 repo 是公開的，絕對不能進版控。
 private/

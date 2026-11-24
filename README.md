@@ -191,7 +191,8 @@ cp .env.example .env
 
 Python 的版本寫在 `group-judge-backend/.python-version`，本機與 Render 用的是同一版
 （Render 會自己讀這個檔案）。套件的版本一律先用最新的正式版，不相容才往下降，原因
-寫在 `requirements.txt` 與 `requirements-dev.txt` 裡。
+寫在 `requirements.in` 與 `requirements-dev.in` 裡；兩個 `.txt` 是從它們產生的，連間接相依
+和雜湊都鎖住了，不要手改（產生的指令在 `requirements.in` 開頭）。
 
 ```bash
 .venv/bin/python tools/local_db.py
