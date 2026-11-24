@@ -307,12 +307,14 @@ APIs & Services → Credentials → Create Credentials → OAuth client ID，類
 
 ### 5. GitHub Pages（前端）
 
-`group-judge-web/index.html` 填兩個值，commit、push：
+`group-judge-web/config.js` 填兩個值，commit、push：
 
 ```js
 window.__GROUP_JUDGE_API_HOST__ = 'https://<Render 給的網址>';
 window.__GOOGLE_CLIENT_ID__ = '<步驟 4 的 Client ID>';
 ```
+
+後端網址如果跟 `index.html` 的 CSP（`connect-src`）裡寫的不一樣，那裡也要改，否則前端連不到後端。
 
 `group-judge-web` 這個 repo 的 Settings → Pages → Source 選「Deploy from a branch」，
 分支 `main`、資料夾 `/ (root)`。網址是 https://group-judge.github.io/group-judge-web/ 。
